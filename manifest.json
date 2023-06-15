@@ -1,0 +1,10 @@
+{
+  "api": "1.0.0",
+  "editorType": [
+    "figjam"
+  ],
+  "id": "sticky-to-json",
+  "name": "StickyToJson",
+  "main": "build/main.js",
+  "ui": "build/ui.js"
+}
