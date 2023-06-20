@@ -1,10 +1,12 @@
-import { once, showUI, emit } from '@create-figma-plugin/utilities'
+import { once, showUI, emit } from "@create-figma-plugin/utilities";
 
-import { CloseHandler, CopyToClipboardHandler, TestHandler, StickyNote } from './types';
-
-interface stampGroups {
-  [key: string]: any;
-}
+import {
+  CloseHandler,
+  CreateExportHandler,
+  CopyToClipboardHandler,
+  StickyNote,
+  stampGroups,
+} from "./types";
 
 /**
  * Check if two nodes are near each other
@@ -12,15 +14,27 @@ interface stampGroups {
  * @param {SceneNode} node2
  * @returns {boolean}
  */
-function isWithinProximity(node1: SceneNode, node2: SceneNode, tolerance = 40) {
-
-  let node1Center = { x: node1.absoluteBoundingBox!.x + node1.width / 2, y: node1.absoluteBoundingBox!.y + node1.height / 2 };
-  let node2Center = { x: node2.absoluteBoundingBox!.x + node2.width / 2, y: node2.absoluteBoundingBox!.y + node2.height / 2 };
+const isWithinProximity = (
+  node1: SceneNode,
+  node2: SceneNode,
+  tolerance = 40
+) => {
+  let node1Center = {
+    x: node1.absoluteBoundingBox!.x + node1.width / 2,
+    y: node1.absoluteBoundingBox!.y + node1.height / 2,
+  };
+  let node2Center = {
+    x: node2.absoluteBoundingBox!.x + node2.width / 2,
+    y: node2.absoluteBoundingBox!.y + node2.height / 2,
+  };
   let proximityWidth = node1.width / 2 + tolerance;
   let proximityHeight = node1.height / 2 + tolerance;
 
-  return Math.abs(node1Center.x - node2Center.x) <= proximityWidth && Math.abs(node1Center.y - node2Center.y) <= proximityHeight;
-}
+  return (
+    Math.abs(node1Center.x - node2Center.x) <= proximityWidth &&
+    Math.abs(node1Center.y - node2Center.y) <= proximityHeight
+  );
+};
 
 /**
  * Return all stamps near a sticky
@@ -28,11 +42,10 @@ function isWithinProximity(node1: SceneNode, node2: SceneNode, tolerance = 40) {
  * @param {StickyNode} sticky
  * @returns {stampGroups}
  */
-function getStampsNearNode(stamps: StampNode[], sticky: StickyNode) {
-
+const getStampsNearNode = (stamps: StampNode[], sticky: StickyNode) => {
   let stampGroups: stampGroups = {};
 
-  stamps.forEach(stamp => {
+  stamps.forEach((stamp) => {
     if (isWithinProximity(sticky, stamp, 60)) {
       if (!stampGroups[stamp.name]) {
         stampGroups[stamp.name] = [];
@@ -42,7 +55,7 @@ function getStampsNearNode(stamps: StampNode[], sticky: StickyNode) {
   });
 
   return stampGroups;
-}
+};
 
 /**
  * Get the section name of a sticky
@@ -50,42 +63,41 @@ function getStampsNearNode(stamps: StampNode[], sticky: StickyNode) {
  * @param {StickyNode} sticky
  * @returns {string}
  */
-function getSectionNearNode(sections: SectionNode[], sticky: StickyNode) {
+const getSectionNearNode = (sections: SectionNode[], sticky: StickyNode) => {
+  const sectionGroups: string[] = [];
 
-  const sectionGroups: string[] = []
-
-  sections.forEach(section => {
+  sections.forEach((section) => {
     if (isWithinProximity(section, sticky, 60)) {
-      sectionGroups.push(section.name)
+      sectionGroups.push(section.name);
     }
   });
 
   return sectionGroups[0] ? sectionGroups[0] : "";
-}
+};
 
 export default function () {
-  once<CloseHandler>('CLOSE', function () {
-    figma.closePlugin()
+  once<CloseHandler>("CLOSE", function () {
+    figma.closePlugin();
   });
-  once<CopyToClipboardHandler>('COPY_TO_CLIPBOARD', function () {
+  once<CreateExportHandler>("CREATE_EXPORT", function () {
     const stickyNodes: StickyNode[] = figma.currentPage.findAllWithCriteria({
-      types: ['STICKY']
-    })
+      types: ["STICKY"],
+    });
 
     const stickies: StickyNote[] = [];
 
     // Find all stamps on the page
     const stampsNodes: StampNode[] = figma.currentPage.findAllWithCriteria({
-      types: ['STAMP']
-    })
+      types: ["STAMP"],
+    });
     console.log(stampsNodes);
 
     // Find all stamps on the page
     const sectionsNodes: SectionNode[] = figma.currentPage.findAllWithCriteria({
-      types: ['SECTION']
-    })
+      types: ["SECTION"],
+    });
 
-    stickyNodes.forEach(sticky => {
+    stickyNodes.forEach((sticky) => {
       let stampVotes = getStampsNearNode(stampsNodes, sticky);
 
       let section = getSectionNearNode(sectionsNodes, sticky);
@@ -98,20 +110,18 @@ export default function () {
         content: sticky.name,
         author: sticky.authorName,
         zone: section,
-        votes: votes
-      }
+        votes: votes,
+      };
       stickies.push(note);
-
     });
-
 
     figma.currentPage.selection = stickyNodes;
     figma.viewport.scrollAndZoomIntoView(stickyNodes);
 
-    emit<TestHandler>('TEST_COPY', JSON.stringify(stickies))
-  })
+    emit<CopyToClipboardHandler>("COPY_TO_CLIPBOARD", JSON.stringify(stickies));
+  });
   showUI({
     height: 137,
-    width: 240
+    width: 240,
   });
 }

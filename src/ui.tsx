@@ -12,7 +12,7 @@ import { emit, once } from '@create-figma-plugin/utilities'
 import { h } from 'preact'
 import { useCallback } from 'preact/hooks'
 
-import { CloseHandler, CopyToClipboardHandler, TestHandler } from './types'
+import { CloseHandler, CreateExportHandler, CopyToClipboardHandler } from './types'
 
 
 function unsecuredCopyToClipboard(text: string) {
@@ -63,18 +63,15 @@ function copyToClipboard(content: string) {
 
 function Plugin() {
 
-  const handleCloseButtonClick = useCallback(function () {
+  const handleCloseButtonClick = useCallback(() => {
     emit<CloseHandler>('CLOSE')
   }, []);
 
-  const handleCopyToClipboard = useCallback(
-    function () {
-      emit<CopyToClipboardHandler>('COPY_TO_CLIPBOARD')
-    },
-    []
-  )
+  const handleCreateExport = useCallback(() => {
+    emit<CreateExportHandler>('CREATE_EXPORT')
+  }, [])
 
-  once<TestHandler>('TEST_COPY', function (json) {
+  once<CopyToClipboardHandler>('COPY_TO_CLIPBOARD', (json) => {
     copyToClipboard(json);
     handleCloseButtonClick();
   })
@@ -90,7 +87,7 @@ function Plugin() {
           <Muted>AND</Muted>
         </Text>
         <VerticalSpace space="small" />
-        <Button fullWidth onClick={handleCopyToClipboard}>
+        <Button fullWidth onClick={handleCreateExport}>
           Copy To Clipboard
         </Button>
       </MiddleAlign>
