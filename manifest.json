@@ -3,8 +3,8 @@
   "editorType": [
     "figjam"
   ],
-  "id": "sticky-to-json",
-  "name": "StickyToJson",
+  "id": "export-stickies",
+  "name": "ExportStickies",
   "main": "build/main.js",
   "ui": "build/ui.js"
 }

@@ -1,4 +1,4 @@
-# Preact Rectangles
+# Export Stickies
 
 ## Development guide
 
