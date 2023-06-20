@@ -75,7 +75,7 @@ const getSectionNearNode = (sections: SectionNode[], sticky: StickyNode) => {
   return sectionGroups[0] ? sectionGroups[0] : "";
 };
 
-export default function () {
+export default () => {
   once<CloseHandler>("CLOSE", function () {
     figma.closePlugin();
   });
@@ -124,4 +124,4 @@ export default function () {
     height: 137,
     width: 240,
   });
-}
+};

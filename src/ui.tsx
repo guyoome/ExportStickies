@@ -15,7 +15,7 @@ import { useCallback } from 'preact/hooks'
 import { CloseHandler, CreateExportHandler, CopyToClipboardHandler } from './types'
 
 
-function unsecuredCopyToClipboard(text: string) {
+const unsecuredCopyToClipboard = (text: string) => {
   // Create a textarea element
   const textArea = document.createElement('textarea');
   textArea.value = text;
@@ -46,7 +46,7 @@ function unsecuredCopyToClipboard(text: string) {
  *
  * @param content - The content to be copied to the clipboard
  */
-function copyToClipboard(content: string) {
+const copyToClipboard = (content: string) => {
   // If the context is secure and clipboard API is available, use it
   if (
     window.isSecureContext &&
@@ -61,7 +61,7 @@ function copyToClipboard(content: string) {
 }
 
 
-function Plugin() {
+const Plugin = () => {
 
   const handleCloseButtonClick = useCallback(() => {
     emit<CloseHandler>('CLOSE')
