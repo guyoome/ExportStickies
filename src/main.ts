@@ -6,6 +6,12 @@ interface stampGroups {
   [key: string]: any;
 }
 
+/**
+ * Check if two nodes are near each other
+ * @param {SceneNode} node1
+ * @param {SceneNode} node2
+ * @returns {boolean}
+ */
 function isWithinProximity(node1: SceneNode, node2: SceneNode, tolerance = 40) {
 
   let node1Center = { x: node1.absoluteBoundingBox!.x + node1.width / 2, y: node1.absoluteBoundingBox!.y + node1.height / 2 };
@@ -16,7 +22,12 @@ function isWithinProximity(node1: SceneNode, node2: SceneNode, tolerance = 40) {
   return Math.abs(node1Center.x - node2Center.x) <= proximityWidth && Math.abs(node1Center.y - node2Center.y) <= proximityHeight;
 }
 
-// Find all votes (stamps) attributed to a sticky (by proximity)
+/**
+ * Return all stamps near a sticky
+ * @param {StampNode[]} stamps
+ * @param {StickyNode} sticky
+ * @returns {stampGroups}
+ */
 function getStampsNearNode(stamps: StampNode[], sticky: StickyNode) {
 
   let stampGroups: stampGroups = {};
@@ -33,15 +44,19 @@ function getStampsNearNode(stamps: StampNode[], sticky: StickyNode) {
   return stampGroups;
 }
 
+/**
+ * Get the section name of a sticky
+ * @param {SectionNode[]} sections
+ * @param {StickyNode} sticky
+ * @returns {string}
+ */
 function getSectionNearNode(sections: SectionNode[], sticky: StickyNode) {
-
-  // let stampGroups: stampGroups = {};
 
   const sectionGroups: string[] = []
 
   sections.forEach(section => {
     if (isWithinProximity(section, sticky, 60)) {
-      sectionGroups.push(section.name) 
+      sectionGroups.push(section.name)
     }
   });
 
@@ -70,14 +85,10 @@ export default function () {
       types: ['SECTION']
     })
 
-
-
     stickyNodes.forEach(sticky => {
       let stampVotes = getStampsNearNode(stampsNodes, sticky);
-      
+
       let section = getSectionNearNode(sectionsNodes, sticky);
-      // console.log("section: ", section);
-      
 
       let votes = stampVotes["+1"]?.length;
       if (votes === undefined) {
@@ -86,7 +97,6 @@ export default function () {
       const note: StickyNote = {
         content: sticky.name,
         author: sticky.authorName,
-        // zone: sticky.parent?.name,
         zone: section,
         votes: votes
       }
