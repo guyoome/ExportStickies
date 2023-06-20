@@ -19,4 +19,5 @@ export type StickyNote = {
   content: string;
   author: string;
   zone: string | undefined;
+  votes: number
 };
